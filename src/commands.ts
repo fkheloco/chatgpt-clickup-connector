@@ -98,8 +98,9 @@ export async function processCommand(message: string) {
     try {
       const prd = JSON.parse(message.replace("export prd", "").trim());
 
-      // Use the same list ID as single task creation
-      const targetListId = "901704202752"; // Development General Tasks
+      // Create a new list in the Proposals folder
+      const folderId = "90172820776"; // Proposals folder
+      const newList = await createList(folderId, { name: prd.projectName });
       const createdTasks: any[] = [];
 
       for (const task of prd.tasks) {
@@ -112,19 +113,41 @@ export async function processCommand(message: string) {
           assignees: assigneeIds,
         };
 
-        const createdTask = await createTask(targetListId, payload);
+        const createdTask = await createTask(newList.id, payload);
         createdTasks.push(createdTask);
       }
 
       return {
         success: true,
         projectName: prd.projectName,
+        list: newList,
         createdCount: createdTasks.length,
         tasks: createdTasks,
-        link: `https://app.clickup.com/${teamId}/v/l/${targetListId}`,
+        link: `https://app.clickup.com/${teamId}/v/l/${newList.id}`,
       };
     } catch (error: any) {
       console.error("Error creating PRD:", error);
+      return { error: error.message };
+    }
+  }
+
+  // === CREATE LIST WITH TASKS ===
+  if (message.toLowerCase().startsWith("create list")) {
+    try {
+      const listName = message.replace("create list", "").trim();
+      console.log("Creating list:", listName);
+      
+      // Create list in the Proposals folder
+      const folderId = "90172820776"; // Proposals folder
+      const newList = await createList(folderId, { name: listName });
+      
+      return {
+        success: true,
+        list: newList,
+        link: `https://app.clickup.com/${teamId}/v/l/${newList.id}`,
+      };
+    } catch (error: any) {
+      console.error("Error creating list:", error);
       return { error: error.message };
     }
   }
