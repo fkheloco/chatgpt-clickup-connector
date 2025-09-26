@@ -107,13 +107,9 @@ export async function processCommand(message: string) {
         const assigneeIds = ["63075093"];
 
         const payload = {
-          name: task.name,
-          description: task.description,
+          name: task.name || "Untitled Task",
+          description: task.description || "",
           assignees: assigneeIds,
-          // Remove problematic fields for now
-          // due_date: new Date(task.dueDate).getTime(),
-          // tags: task.tags,
-          // priority: mapPriority(task.priority),
         };
 
         const createdTask = await createTask(targetListId, payload);
