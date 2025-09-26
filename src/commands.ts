@@ -15,6 +15,60 @@ function mapPriority(priority: string): number {
 export async function processCommand(message: string) {
   const teamId = process.env.CLICKUP_TEAM_ID as string;
 
+  // === BULK CREATE TASKS ===
+  // Supports commands like:
+  // "create tasks" or "create task list" followed by newline-separated task names (bulleted or plain)
+  if (message.toLowerCase().startsWith("create tasks") || message.toLowerCase().startsWith("create task list")) {
+    try {
+      // Target list for bulk tasks
+      const targetListId = "901705691847";
+
+      // Extract the portion after the command phrase
+      const linesBlock = message
+        .replace(/^create tasks/i, "")
+        .replace(/^create task list/i, "")
+        .trim();
+
+      if (!linesBlock) {
+        return { error: "No tasks provided. Provide newline-separated task names after 'create tasks'." };
+      }
+
+      const rawLines = linesBlock.split(/\r?\n/);
+
+      // Normalize lines: remove bullets, numbers, emojis, and trim
+      const taskNames = rawLines
+        .map((line) =>
+          line
+            .replace(/^[-*•\u2022\u25CF\u25CB\u25A0\u25AA\u25AB\s]+/, "") // bullets
+            .replace(/^\d+\.|^\d+\)|^\(\d+\)\s*/, "") // numeric lists
+            .replace(/^👉\s*|^➡️\s*|^✅\s*|^✔️\s*|^–\s*/, "") // common emojis/dashes
+            .trim()
+        )
+        .filter((t) => t.length > 0);
+
+      if (taskNames.length === 0) {
+        return { error: "No valid task names found after parsing input lines." };
+      }
+
+      const created: any[] = [];
+      for (const taskName of taskNames) {
+        const payload = { name: taskName };
+        const task = await createTask(targetListId, payload);
+        created.push({ id: task.id, name: task.name, url: task.url });
+      }
+
+      return {
+        success: true,
+        createdCount: created.length,
+        tasks: created,
+        link: `https://app.clickup.com/${teamId}/v/l/${targetListId}`,
+      };
+    } catch (error: any) {
+      console.error("Error bulk creating tasks:", error);
+      return { error: error.message };
+    }
+  }
+
   // === CREATE TASK ===
   if (message.toLowerCase().startsWith("create task")) {
     try {

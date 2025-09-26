@@ -7,14 +7,32 @@ async function request(method: string, url: string, data?: any) {
     Authorization: process.env.CLICKUP_API_KEY || "",
     "Content-Type": "application/json",
   };
-  
-  const response = await axios({
-    method,
-    url: `${BASE_URL}${url}`,
-    headers,
-    data,
-  });
-  return response.data;
+
+  try {
+    const response = await axios({
+      method,
+      url: `${BASE_URL}${url}`,
+      headers,
+      data,
+      timeout: 30000,
+      validateStatus: (status) => status >= 200 && status < 300,
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      const { status, statusText, data: responseData } = error.response;
+      const payloadPreview = typeof data === "string" ? data : JSON.stringify(data);
+      const message = `ClickUp API error ${status} ${statusText}: ${JSON.stringify(responseData)} | payload=${payloadPreview}`;
+      console.error(message);
+      throw new Error(message);
+    }
+    if (error.request) {
+      console.error("ClickUp API request error (no response):", error.message);
+      throw new Error(`ClickUp API request error: ${error.message}`);
+    }
+    console.error("ClickUp API unexpected error:", error.message);
+    throw new Error(`ClickUp API unexpected error: ${error.message}`);
+  }
 }
 
 // Spaces / Folders / Lists

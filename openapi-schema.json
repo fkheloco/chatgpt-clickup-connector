@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.1.0",
   "info": {
     "title": "ChatGPT ClickUp Connector",
     "description": "AI assistant that helps manage ClickUp projects, create tasks, and export PRDs directly to your ClickUp workspace.",
@@ -26,12 +26,7 @@
                 "properties": {
                   "message": {
                     "type": "string",
-                    "description": "The command message to process. Supported commands: 'create task [name]', 'export prd [JSON]', 'update project [name]'",
-                    "examples": [
-                      "create task Update website copy",
-                      "export prd {\"projectName\":\"New Feature\",\"tasks\":[{\"name\":\"Design UI\",\"description\":\"Create mockups\",\"assignees\":[\"Sarah\"],\"dueDate\":\"2024-12-31\",\"tags\":[\"design\"],\"priority\":\"high\"}]}",
-                      "update project Q4 Marketing Campaign"
-                    ]
+                    "description": "The command message to process. Supported commands: 'create task [name]', 'export prd [JSON]', 'update project [name]'"
                   }
                 },
                 "required": ["message"]
@@ -211,7 +206,53 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "description": "ClickUp webhook payload"
+                "description": "ClickUp webhook payload",
+                "properties": {
+                  "event": {
+                    "type": "string",
+                    "description": "The type of event that triggered the webhook",
+                    "example": "taskCreated"
+                  },
+                  "task_id": {
+                    "type": "string",
+                    "description": "The ID of the task that was affected",
+                    "example": "86dxvpgtn"
+                  },
+                  "webhook_id": {
+                    "type": "string",
+                    "description": "The ID of the webhook that was triggered",
+                    "example": "webhook_123"
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "description": "The ID of the user who performed the action",
+                    "example": "user_456"
+                  },
+                  "team_id": {
+                    "type": "string",
+                    "description": "The ID of the team",
+                    "example": "team_789"
+                  },
+                  "data": {
+                    "type": "object",
+                    "description": "Additional data related to the event",
+                    "properties": {
+                      "task": {
+                        "type": "object",
+                        "description": "Task details if applicable"
+                      },
+                      "list": {
+                        "type": "object",
+                        "description": "List details if applicable"
+                      },
+                      "space": {
+                        "type": "object",
+                        "description": "Space details if applicable"
+                      }
+                    }
+                  }
+                },
+                "required": ["event", "webhook_id", "user_id", "team_id"]
               }
             }
           }
