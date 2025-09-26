@@ -98,10 +98,8 @@ export async function processCommand(message: string) {
     try {
       const prd = JSON.parse(message.replace("export prd", "").trim());
 
-      // Use the specific folder ID from the URL you provided
-      const folderId = "90172820776"; // Proposals folder
-      
-      const newList = await createList(folderId, { name: prd.projectName });
+      // Use the target list ID for PRD tasks
+      const targetListId = "901705691847"; // Target list for PRD tasks
       const createdTasks: any[] = [];
 
       for (const task of prd.tasks) {
@@ -120,15 +118,16 @@ export async function processCommand(message: string) {
           priority: mapPriority(task.priority),
         };
 
-        const createdTask = await createTask(newList.id, payload);
+        const createdTask = await createTask(targetListId, payload);
         createdTasks.push(createdTask);
       }
 
       return {
         success: true,
-        list: newList,
-        tasks: createdTasks.length,
-        link: `https://app.clickup.com/${teamId}/v/l/${newList.id}`,
+        projectName: prd.projectName,
+        createdCount: createdTasks.length,
+        tasks: createdTasks,
+        link: `https://app.clickup.com/${teamId}/v/l/${targetListId}`,
       };
     } catch (error: any) {
       console.error("Error creating PRD:", error);
