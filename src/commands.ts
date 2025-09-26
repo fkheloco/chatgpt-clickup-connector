@@ -98,8 +98,8 @@ export async function processCommand(message: string) {
     try {
       const prd = JSON.parse(message.replace("export prd", "").trim());
 
-      // Use the target list ID for PRD tasks
-      const targetListId = "901705691847"; // Target list for PRD tasks
+      // Use the same list ID as single task creation
+      const targetListId = "901704202752"; // Development General Tasks
       const createdTasks: any[] = [];
 
       for (const task of prd.tasks) {
@@ -110,9 +110,10 @@ export async function processCommand(message: string) {
           name: task.name,
           description: task.description,
           assignees: assigneeIds,
-          due_date: new Date(task.dueDate).getTime(),
-          tags: task.tags,
-          priority: mapPriority(task.priority),
+          // Remove problematic fields for now
+          // due_date: new Date(task.dueDate).getTime(),
+          // tags: task.tags,
+          // priority: mapPriority(task.priority),
         };
 
         const createdTask = await createTask(targetListId, payload);
