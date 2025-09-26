@@ -1,0 +1,235 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ChatGPT ClickUp Connector",
+    "description": "AI assistant that helps manage ClickUp projects, create tasks, and export PRDs directly to your ClickUp workspace.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://chatgpt-clickup-connector-production.up.railway.app",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/chat": {
+      "post": {
+        "summary": "Process ClickUp commands",
+        "description": "Main endpoint for processing ClickUp-related commands including task creation, PRD export, and project management.",
+        "operationId": "processClickUpCommand",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "The command message to process. Supported commands: 'create task [name]', 'export prd [JSON]', 'update project [name]'",
+                    "examples": [
+                      "create task Update website copy",
+                      "export prd {\"projectName\":\"New Feature\",\"tasks\":[{\"name\":\"Design UI\",\"description\":\"Create mockups\",\"assignees\":[\"Sarah\"],\"dueDate\":\"2024-12-31\",\"tags\":[\"design\"],\"priority\":\"high\"}]}",
+                      "update project Q4 Marketing Campaign"
+                    ]
+                  }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "task": {
+                          "type": "object",
+                          "description": "Created task details",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "86dxvpgtn"
+                            },
+                            "name": {
+                              "type": "string",
+                              "example": "Test Railway Deployment"
+                            },
+                            "url": {
+                              "type": "string",
+                              "example": "https://app.clickup.com/t/86dxvpgtn"
+                            },
+                            "status": {
+                              "type": "object",
+                              "properties": {
+                                "status": {
+                                  "type": "string",
+                                  "example": "open"
+                                }
+                              }
+                            },
+                            "assignees": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "username": {
+                                    "type": "string",
+                                    "example": "Farid Kheloco"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "list": {
+                          "type": "object",
+                          "description": "Created list details",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "901704202752"
+                            },
+                            "name": {
+                              "type": "string",
+                              "example": "New Feature"
+                            }
+                          }
+                        },
+                        "tasks": {
+                          "type": "number",
+                          "description": "Number of tasks created",
+                          "example": 3
+                        },
+                        "link": {
+                          "type": "string",
+                          "description": "Direct link to the created list",
+                          "example": "https://app.clickup.com/9017044797/v/l/901704202752"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "project": {
+                          "type": "string",
+                          "example": "Q4 Marketing Campaign"
+                        },
+                        "summary": {
+                          "type": "object",
+                          "description": "Project status summary",
+                          "example": {
+                            "open": 5,
+                            "in progress": 3,
+                            "completed": 2
+                          }
+                        },
+                        "link": {
+                          "type": "string",
+                          "description": "Direct link to the project",
+                          "example": "https://app.clickup.com/9017044797/v/l/901704202752"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "string",
+                          "description": "Error message",
+                          "example": "Unknown command"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - missing or invalid message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Message required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhook": {
+      "post": {
+        "summary": "ClickUp webhook handler",
+        "description": "Placeholder endpoint for future ClickUp webhook integration",
+        "operationId": "handleClickUpWebhook",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "ClickUp webhook payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "OK"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
