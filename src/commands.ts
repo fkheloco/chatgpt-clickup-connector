@@ -103,11 +103,8 @@ export async function processCommand(message: string) {
       const createdTasks: any[] = [];
 
       for (const task of prd.tasks) {
-        const assigneeIds: string[] = [];
-        for (const assigneeName of task.assignees) {
-          const user = await resolveUserIdByName(teamId, assigneeName);
-          if (user) assigneeIds.push(user.id);
-        }
+        // Use hardcoded assignee ID for now (Farid Kheloco)
+        const assigneeIds = ["63075093"];
 
         const payload = {
           name: task.name,
