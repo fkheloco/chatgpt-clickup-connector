@@ -12,29 +12,27 @@ function mapPriority(priority: string): number {
   }
 }
 
-// Format description for ClickUp (convert markdown to HTML)
+// Format description for ClickUp (convert markdown to ClickUp-compatible format)
 function formatDescriptionForClickUp(description: string): string {
   if (!description) return "";
   
   return description
-    // Convert ## headers to <h3> tags
-    .replace(/^## (.+)$/gm, '<h3 style="color: #2d3748; font-weight: 600; margin: 16px 0 8px 0; font-size: 16px;">$1</h3>')
-    // Convert ### headers to <h4> tags
-    .replace(/^### (.+)$/gm, '<h4 style="color: #4a5568; font-weight: 600; margin: 12px 0 6px 0; font-size: 14px;">$1</h4>')
-    // Convert bullet points to HTML lists
-    .replace(/^- (.+)$/gm, '<li style="margin: 4px 0; color: #2d3748;">$1</li>')
-    // Wrap consecutive list items in <ul>
-    .replace(/(<li[^>]*>.*<\/li>(\s*<li[^>]*>.*<\/li>)*)/gs, '<ul style="margin: 8px 0; padding-left: 20px;">$1</ul>')
-    // Convert **bold** to <strong>
-    .replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight: 600; color: #2d3748;">$1</strong>')
-    // Convert *italic* to <em>
-    .replace(/\*(.+?)\*/g, '<em style="font-style: italic; color: #4a5568;">$1</em>')
-    // Convert `code` to <code>
-    .replace(/`([^`]+)`/g, '<code style="background: #f7fafc; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #e53e3e;">$1</code>')
-    // Convert line breaks to <br>
-    .replace(/\n/g, '<br>')
-    // Clean up extra <br> tags
-    .replace(/(<br>){3,}/g, '<br><br>');
+    // Convert ## headers to bold text with spacing
+    .replace(/^## (.+)$/gm, '\n📋 $1\n' + '='.repeat(50))
+    // Convert ### headers to bold text
+    .replace(/^### (.+)$/gm, '\n🔹 $1')
+    // Convert bullet points to ClickUp-friendly format
+    .replace(/^- (.+)$/gm, '• $1')
+    // Convert **bold** to ClickUp bold (using **)
+    .replace(/\*\*(.+?)\*\*/g, '**$1**')
+    // Convert *italic* to ClickUp italic (using *)
+    .replace(/\*(.+?)\*/g, '*$1*')
+    // Convert `code` to ClickUp code (using backticks)
+    .replace(/`([^`]+)`/g, '`$1`')
+    // Clean up extra line breaks
+    .replace(/\n{3,}/g, '\n\n')
+    // Trim whitespace
+    .trim();
 }
 
 export async function processCommand(message: string) {
