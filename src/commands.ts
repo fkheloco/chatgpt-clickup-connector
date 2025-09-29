@@ -262,7 +262,7 @@ export async function processCommand(message: string) {
         list: newList,
         createdCount: createdTasks.length,
         tasks: createdTasks,
-        link: `https://app.clickup.com/${teamId}/v/l/${targetListId}`,
+        link: `https://app.clickup.com/${teamId}/v/l/${newList.id}`,
       };
     } catch (error: any) {
       console.error("Error creating detailed project:", error);
