@@ -26,7 +26,7 @@
                 "properties": {
                   "message": {
                     "type": "string",
-                    "description": "The command message to process. Supported commands: 'create task [name]', 'export prd [JSON]', 'update project [name]'"
+                    "description": "The command message to process. Supported commands: 'create task [name]', 'create tasks [newline-separated list]', 'export prd [JSON]', 'create detailed project [JSON]', 'update project [name]'"
                   }
                 },
                 "required": ["message"]

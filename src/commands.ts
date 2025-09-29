@@ -1,4 +1,4 @@
-import { createTask, createList, getTasks } from "./clickupClient";
+import { createTask, createList, getTasks, createSubtask } from "./clickupClient";
 import { resolveSpaceIdByName, resolveFolderIdByName, resolveListIdByName, resolveUserIdByName } from "./resolver";
 
 // Map text priority → ClickUp numeric priority
@@ -104,17 +104,77 @@ export async function processCommand(message: string) {
       const createdTasks: any[] = [];
 
       for (const task of prd.tasks) {
-        // Use hardcoded assignee ID for now (Farid Kheloco)
-        const assigneeIds = ["63075093"];
+        // Resolve assignees by email/name
+        const assigneeIds: string[] = [];
+        for (const assignee of task.assignees || []) {
+          const user = await resolveUserIdByName(teamId, assignee);
+          if (user) assigneeIds.push(user.id);
+        }
+        
+        // If no assignees found, use default
+        if (assigneeIds.length === 0) {
+          assigneeIds.push("63075093"); // Farid Kheloco as default
+        }
+
+        // Calculate due date
+        let dueDate = null;
+        if (task.dueDate) {
+          dueDate = new Date(task.dueDate).getTime();
+        }
+
+        // Calculate start date
+        let startDate = null;
+        if (task.startDate) {
+          startDate = new Date(task.startDate).getTime();
+        }
 
         const payload = {
           name: task.name || "Untitled Task",
           description: task.description || "",
           assignees: assigneeIds,
+          due_date: dueDate,
+          start_date: startDate,
+          tags: task.tags || [],
+          priority: mapPriority(task.priority || "normal"),
+          time_estimate: task.timeEstimate ? parseInt(task.timeEstimate) * 3600000 : null, // Convert hours to milliseconds
+          custom_fields: task.customFields || [],
         };
 
         const createdTask = await createTask(newList.id, payload);
         createdTasks.push(createdTask);
+
+        // Create subtasks if they exist
+        if (task.subtasks && task.subtasks.length > 0) {
+          for (const subtask of task.subtasks) {
+            const subtaskAssigneeIds: string[] = [];
+            for (const assignee of subtask.assignees || []) {
+              const user = await resolveUserIdByName(teamId, assignee);
+              if (user) subtaskAssigneeIds.push(user.id);
+            }
+            
+            if (subtaskAssigneeIds.length === 0) {
+              subtaskAssigneeIds.push("63075093");
+            }
+
+            const subtaskPayload = {
+              name: subtask.name || "Untitled Subtask",
+              description: subtask.description || "",
+              assignees: subtaskAssigneeIds,
+              due_date: subtask.dueDate ? new Date(subtask.dueDate).getTime() : null,
+              start_date: subtask.startDate ? new Date(subtask.startDate).getTime() : null,
+              tags: subtask.tags || [],
+              priority: mapPriority(subtask.priority || "normal"),
+              time_estimate: subtask.timeEstimate ? parseInt(subtask.timeEstimate) * 3600000 : null,
+            };
+
+            try {
+              const createdSubtask = await createSubtask(createdTask.id, subtaskPayload);
+              console.log(`Created subtask: ${subtask.name}`);
+            } catch (subtaskError) {
+              console.error(`Error creating subtask ${subtask.name}:`, subtaskError);
+            }
+          }
+        }
       }
 
       return {
@@ -127,6 +187,104 @@ export async function processCommand(message: string) {
       };
     } catch (error: any) {
       console.error("Error creating PRD:", error);
+      return { error: error.message };
+    }
+  }
+
+  // === CREATE DETAILED PROJECT ===
+  if (message.toLowerCase().startsWith("create detailed project")) {
+    try {
+      const projectData = JSON.parse(message.replace("create detailed project", "").trim());
+
+      // Create list in the Proposals folder
+      const folderId = "90172820776"; // Proposals folder
+      const newList = await createList(folderId, { name: projectData.projectName });
+      const createdTasks: any[] = [];
+
+      for (const task of projectData.tasks) {
+        // Resolve assignees by email/name
+        const assigneeIds: string[] = [];
+        for (const assignee of task.assignees || []) {
+          const user = await resolveUserIdByName(teamId, assignee);
+          if (user) assigneeIds.push(user.id);
+        }
+        
+        // If no assignees found, use default
+        if (assigneeIds.length === 0) {
+          assigneeIds.push("63075093"); // Farid Kheloco as default
+        }
+
+        // Calculate due date
+        let dueDate = null;
+        if (task.dueDate) {
+          dueDate = new Date(task.dueDate).getTime();
+        }
+
+        // Calculate start date
+        let startDate = null;
+        if (task.startDate) {
+          startDate = new Date(task.startDate).getTime();
+        }
+
+        const payload = {
+          name: task.name || "Untitled Task",
+          description: task.description || "",
+          assignees: assigneeIds,
+          due_date: dueDate,
+          start_date: startDate,
+          tags: task.tags || [],
+          priority: mapPriority(task.priority || "normal"),
+          time_estimate: task.timeEstimate ? parseInt(task.timeEstimate) * 3600000 : null, // Convert hours to milliseconds
+          custom_fields: task.customFields || [],
+        };
+
+        const createdTask = await createTask(newList.id, payload);
+        createdTasks.push(createdTask);
+
+        // Create subtasks if they exist
+        if (task.subtasks && task.subtasks.length > 0) {
+          for (const subtask of task.subtasks) {
+            const subtaskAssigneeIds: string[] = [];
+            for (const assignee of subtask.assignees || []) {
+              const user = await resolveUserIdByName(teamId, assignee);
+              if (user) subtaskAssigneeIds.push(user.id);
+            }
+            
+            if (subtaskAssigneeIds.length === 0) {
+              subtaskAssigneeIds.push("63075093");
+            }
+
+            const subtaskPayload = {
+              name: subtask.name || "Untitled Subtask",
+              description: subtask.description || "",
+              assignees: subtaskAssigneeIds,
+              due_date: subtask.dueDate ? new Date(subtask.dueDate).getTime() : null,
+              start_date: subtask.startDate ? new Date(subtask.startDate).getTime() : null,
+              tags: subtask.tags || [],
+              priority: mapPriority(subtask.priority || "normal"),
+              time_estimate: subtask.timeEstimate ? parseInt(subtask.timeEstimate) * 3600000 : null,
+            };
+
+            try {
+              const createdSubtask = await createSubtask(createdTask.id, subtaskPayload);
+              console.log(`Created subtask: ${subtask.name}`);
+            } catch (subtaskError) {
+              console.error(`Error creating subtask ${subtask.name}:`, subtaskError);
+            }
+          }
+        }
+      }
+
+      return {
+        success: true,
+        projectName: projectData.projectName,
+        list: newList,
+        createdCount: createdTasks.length,
+        tasks: createdTasks,
+        link: `https://app.clickup.com/${teamId}/v/l/${newList.id}`,
+      };
+    } catch (error: any) {
+      console.error("Error creating detailed project:", error);
       return { error: error.message };
     }
   }

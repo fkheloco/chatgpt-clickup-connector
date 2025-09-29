@@ -61,6 +61,10 @@ export async function createTask(listId: string, payload: any) {
   return request("POST", `/list/${listId}/task`, payload);
 }
 
+export async function createSubtask(parentTaskId: string, payload: any) {
+  return request("POST", `/task/${parentTaskId}/subtask`, payload);
+}
+
 export async function updateTask(taskId: string, payload: any) {
   return request("PUT", `/task/${taskId}`, payload);
 }
