@@ -41,7 +41,7 @@ export async function resolveUserIdByName(teamId: string, name: string) {
     }));
     
     // Try exact email match first
-    const emailMatch = members.find(m => m.email === name);
+    const emailMatch = members.find((m: any) => m.email === name);
     if (emailMatch) return emailMatch;
     
     // Try fuzzy match on username

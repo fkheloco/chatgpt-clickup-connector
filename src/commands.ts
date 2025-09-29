@@ -189,6 +189,7 @@ export async function processCommand(message: string) {
       const folderId = "90172820776"; // Proposals folder
       const newList = await createList(folderId, { name: projectData.projectName });
       const createdTasks: any[] = [];
+      const targetListId = newList.id;
 
       for (const task of projectData.tasks) {
         // Use hardcoded assignee ID for now to avoid user resolution issues
@@ -282,7 +283,7 @@ export async function processCommand(message: string) {
       return {
         success: true,
         list: newList,
-        link: `https://app.clickup.com/${teamId}/v/l/${targetListId}`,
+        link: `https://app.clickup.com/${teamId}/v/l/${newList.id}`,
       };
     } catch (error: any) {
       console.error("Error creating list:", error);
