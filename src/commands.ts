@@ -12,6 +12,31 @@ function mapPriority(priority: string): number {
   }
 }
 
+// Format description for ClickUp (convert markdown to HTML)
+function formatDescriptionForClickUp(description: string): string {
+  if (!description) return "";
+  
+  return description
+    // Convert ## headers to <h3> tags
+    .replace(/^## (.+)$/gm, '<h3 style="color: #2d3748; font-weight: 600; margin: 16px 0 8px 0; font-size: 16px;">$1</h3>')
+    // Convert ### headers to <h4> tags
+    .replace(/^### (.+)$/gm, '<h4 style="color: #4a5568; font-weight: 600; margin: 12px 0 6px 0; font-size: 14px;">$1</h4>')
+    // Convert bullet points to HTML lists
+    .replace(/^- (.+)$/gm, '<li style="margin: 4px 0; color: #2d3748;">$1</li>')
+    // Wrap consecutive list items in <ul>
+    .replace(/(<li[^>]*>.*<\/li>(\s*<li[^>]*>.*<\/li>)*)/gs, '<ul style="margin: 8px 0; padding-left: 20px;">$1</ul>')
+    // Convert **bold** to <strong>
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight: 600; color: #2d3748;">$1</strong>')
+    // Convert *italic* to <em>
+    .replace(/\*(.+?)\*/g, '<em style="font-style: italic; color: #4a5568;">$1</em>')
+    // Convert `code` to <code>
+    .replace(/`([^`]+)`/g, '<code style="background: #f7fafc; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #e53e3e;">$1</code>')
+    // Convert line breaks to <br>
+    .replace(/\n/g, '<br>')
+    // Clean up extra <br> tags
+    .replace(/(<br>){3,}/g, '<br><br>');
+}
+
 export async function processCommand(message: string) {
   const teamId = process.env.CLICKUP_TEAM_ID as string;
 
@@ -118,9 +143,12 @@ export async function processCommand(message: string) {
           startDate = new Date(task.startDate).getTime();
         }
 
+        // Format description for ClickUp (convert markdown to HTML)
+        const formattedDescription = formatDescriptionForClickUp(task.description || "");
+
         const payload = {
           name: task.name || "Untitled Task",
-          description: task.description || "",
+          description: formattedDescription,
           assignees: assigneeIds,
           due_date: dueDate,
           start_date: startDate,
@@ -148,7 +176,7 @@ export async function processCommand(message: string) {
 
             const subtaskPayload = {
               name: subtask.name || "Untitled Subtask",
-              description: subtask.description || "",
+              description: formatDescriptionForClickUp(subtask.description || ""),
               assignees: subtaskAssigneeIds,
               due_date: subtask.dueDate ? new Date(subtask.dueDate).getTime() : null,
               start_date: subtask.startDate ? new Date(subtask.startDate).getTime() : null,
@@ -207,9 +235,12 @@ export async function processCommand(message: string) {
           startDate = new Date(task.startDate).getTime();
         }
 
+        // Format description for ClickUp (convert markdown to HTML)
+        const formattedDescription = formatDescriptionForClickUp(task.description || "");
+
         const payload = {
           name: task.name || "Untitled Task",
-          description: task.description || "",
+          description: formattedDescription,
           assignees: assigneeIds,
           due_date: dueDate,
           start_date: startDate,
@@ -237,7 +268,7 @@ export async function processCommand(message: string) {
 
             const subtaskPayload = {
               name: subtask.name || "Untitled Subtask",
-              description: subtask.description || "",
+              description: formatDescriptionForClickUp(subtask.description || ""),
               assignees: subtaskAssigneeIds,
               due_date: subtask.dueDate ? new Date(subtask.dueDate).getTime() : null,
               start_date: subtask.startDate ? new Date(subtask.startDate).getTime() : null,
