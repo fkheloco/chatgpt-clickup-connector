@@ -98,9 +98,8 @@ export async function processCommand(message: string) {
     try {
       const prd = JSON.parse(message.replace("export prd", "").trim());
 
-      // Create a new list in the Proposals folder
-      const folderId = "90172820776"; // Proposals folder
-      const newList = await createList(folderId, { name: prd.projectName });
+      // Use existing list for now to avoid list creation issues
+      const targetListId = "901704202752"; // Development General Tasks
       const createdTasks: any[] = [];
 
       for (const task of prd.tasks) {
@@ -131,7 +130,7 @@ export async function processCommand(message: string) {
           custom_fields: task.customFields || [],
         };
 
-        const createdTask = await createTask(newList.id, payload);
+        const createdTask = await createTask(targetListId, payload);
         createdTasks.push(createdTask);
 
         // Create subtasks if they exist
@@ -171,10 +170,9 @@ export async function processCommand(message: string) {
       return {
         success: true,
         projectName: prd.projectName,
-        list: newList,
         createdCount: createdTasks.length,
         tasks: createdTasks,
-        link: `https://app.clickup.com/${teamId}/v/l/${newList.id}`,
+        link: `https://app.clickup.com/${teamId}/v/l/${targetListId}`,
       };
     } catch (error: any) {
       console.error("Error creating PRD:", error);
@@ -220,7 +218,7 @@ export async function processCommand(message: string) {
           custom_fields: task.customFields || [],
         };
 
-        const createdTask = await createTask(newList.id, payload);
+        const createdTask = await createTask(targetListId, payload);
         createdTasks.push(createdTask);
 
         // Create subtasks if they exist
@@ -263,7 +261,7 @@ export async function processCommand(message: string) {
         list: newList,
         createdCount: createdTasks.length,
         tasks: createdTasks,
-        link: `https://app.clickup.com/${teamId}/v/l/${newList.id}`,
+        link: `https://app.clickup.com/${teamId}/v/l/${targetListId}`,
       };
     } catch (error: any) {
       console.error("Error creating detailed project:", error);
@@ -284,7 +282,7 @@ export async function processCommand(message: string) {
       return {
         success: true,
         list: newList,
-        link: `https://app.clickup.com/${teamId}/v/l/${newList.id}`,
+        link: `https://app.clickup.com/${teamId}/v/l/${targetListId}`,
       };
     } catch (error: any) {
       console.error("Error creating list:", error);
