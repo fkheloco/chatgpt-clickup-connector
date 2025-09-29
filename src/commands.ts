@@ -104,17 +104,8 @@ export async function processCommand(message: string) {
       const createdTasks: any[] = [];
 
       for (const task of prd.tasks) {
-        // Resolve assignees by email/name
-        const assigneeIds: string[] = [];
-        for (const assignee of task.assignees || []) {
-          const user = await resolveUserIdByName(teamId, assignee);
-          if (user) assigneeIds.push(user.id);
-        }
-        
-        // If no assignees found, use default
-        if (assigneeIds.length === 0) {
-          assigneeIds.push("63075093"); // Farid Kheloco as default
-        }
+        // Use hardcoded assignee ID for now to avoid user resolution issues
+        const assigneeIds = ["63075093"]; // Farid Kheloco as default
 
         // Calculate due date
         let dueDate = null;
@@ -202,17 +193,8 @@ export async function processCommand(message: string) {
       const createdTasks: any[] = [];
 
       for (const task of projectData.tasks) {
-        // Resolve assignees by email/name
-        const assigneeIds: string[] = [];
-        for (const assignee of task.assignees || []) {
-          const user = await resolveUserIdByName(teamId, assignee);
-          if (user) assigneeIds.push(user.id);
-        }
-        
-        // If no assignees found, use default
-        if (assigneeIds.length === 0) {
-          assigneeIds.push("63075093"); // Farid Kheloco as default
-        }
+        // Use hardcoded assignee ID for now to avoid user resolution issues
+        const assigneeIds = ["63075093"]; // Farid Kheloco as default
 
         // Calculate due date
         let dueDate = null;
