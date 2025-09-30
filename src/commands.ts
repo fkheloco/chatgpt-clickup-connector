@@ -160,7 +160,9 @@ export async function processCommand(message: string) {
         createdTasks.push(createdTask);
 
         // Create subtasks if they exist
+        console.log(`Task ${task.name} has subtasks:`, task.subtasks ? task.subtasks.length : 0);
         if (task.subtasks && task.subtasks.length > 0) {
+          console.log(`Processing ${task.subtasks.length} subtasks for task: ${task.name}`);
           for (const subtask of task.subtasks) {
             const subtaskAssigneeIds: string[] = [];
             for (const assignee of subtask.assignees || []) {
@@ -184,10 +186,12 @@ export async function processCommand(message: string) {
             };
 
             try {
+              console.log(`Creating subtask: ${subtask.name} for parent task: ${createdTask.id}`);
+              console.log(`Subtask payload:`, JSON.stringify(subtaskPayload, null, 2));
               const createdSubtask = await createSubtask(createdTask.id, subtaskPayload);
-              console.log(`Created subtask: ${subtask.name}`);
+              console.log(`✅ Created subtask: ${subtask.name}`, createdSubtask);
             } catch (subtaskError) {
-              console.error(`Error creating subtask ${subtask.name}:`, subtaskError);
+              console.error(`❌ Error creating subtask ${subtask.name}:`, subtaskError);
             }
           }
         }
@@ -252,7 +256,9 @@ export async function processCommand(message: string) {
         createdTasks.push(createdTask);
 
         // Create subtasks if they exist
+        console.log(`Task ${task.name} has subtasks:`, task.subtasks ? task.subtasks.length : 0);
         if (task.subtasks && task.subtasks.length > 0) {
+          console.log(`Processing ${task.subtasks.length} subtasks for task: ${task.name}`);
           for (const subtask of task.subtasks) {
             const subtaskAssigneeIds: string[] = [];
             for (const assignee of subtask.assignees || []) {
@@ -276,10 +282,12 @@ export async function processCommand(message: string) {
             };
 
             try {
+              console.log(`Creating subtask: ${subtask.name} for parent task: ${createdTask.id}`);
+              console.log(`Subtask payload:`, JSON.stringify(subtaskPayload, null, 2));
               const createdSubtask = await createSubtask(createdTask.id, subtaskPayload);
-              console.log(`Created subtask: ${subtask.name}`);
+              console.log(`✅ Created subtask: ${subtask.name}`, createdSubtask);
             } catch (subtaskError) {
-              console.error(`Error creating subtask ${subtask.name}:`, subtaskError);
+              console.error(`❌ Error creating subtask ${subtask.name}:`, subtaskError);
             }
           }
         }
