@@ -61,8 +61,13 @@ export async function createTask(listId: string, payload: any) {
   return request("POST", `/list/${listId}/task`, payload);
 }
 
-export async function createSubtask(parentTaskId: string, payload: any) {
-  return request("POST", `/task/${parentTaskId}/subtask`, payload);
+export async function createSubtask(parentTaskId: string, listId: string, payload: any) {
+  // Create subtask by adding parent field to regular task creation
+  const subtaskPayload = {
+    ...payload,
+    parent: parentTaskId
+  };
+  return request("POST", `/list/${listId}/task`, subtaskPayload);
 }
 
 export async function updateTask(taskId: string, payload: any) {

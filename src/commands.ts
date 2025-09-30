@@ -188,7 +188,7 @@ export async function processCommand(message: string) {
             try {
               console.log(`Creating subtask: ${subtask.name} for parent task: ${createdTask.id}`);
               console.log(`Subtask payload:`, JSON.stringify(subtaskPayload, null, 2));
-              const createdSubtask = await createSubtask(createdTask.id, subtaskPayload);
+              const createdSubtask = await createSubtask(createdTask.id, targetListId, subtaskPayload);
               console.log(`✅ Created subtask: ${subtask.name}`, createdSubtask);
             } catch (subtaskError) {
               console.error(`❌ Error creating subtask ${subtask.name}:`, subtaskError);
@@ -284,7 +284,7 @@ export async function processCommand(message: string) {
             try {
               console.log(`Creating subtask: ${subtask.name} for parent task: ${createdTask.id}`);
               console.log(`Subtask payload:`, JSON.stringify(subtaskPayload, null, 2));
-              const createdSubtask = await createSubtask(createdTask.id, subtaskPayload);
+              const createdSubtask = await createSubtask(createdTask.id, newList.id, subtaskPayload);
               console.log(`✅ Created subtask: ${subtask.name}`, createdSubtask);
             } catch (subtaskError) {
               console.error(`❌ Error creating subtask ${subtask.name}:`, subtaskError);
